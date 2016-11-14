@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "express": "^4.14.0",
+    "forever-monitor": "^1.7.1",
     "http-proxy": "^1.15.2",
     "ip": "^1.1.4",
     "request": "^2.78.0",
