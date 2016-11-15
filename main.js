@@ -34,10 +34,17 @@ function createServer(portnumber, callback){
   return callback(server);
 }
 
-var server = createServer(3000, function(server){
-  // console.log(server.address().port);
-  return server;
-});
+if(process.argv.slice(2)[0] == 'clearRedisHost'){
+    clearRedisHosts();
+}
+else
+{
+    var server = createServer(3000, function(server){
+        // console.log(server.address().port);
+        return server;
+    });
+
+}
 
 
 // Add hook to make it easier to get all visited URLS.
@@ -180,9 +187,7 @@ process.on('exit', function(){
   clearRedisHosts();
 });
 
-if(process.argv.slice(2)[0] == 'clearRedisHost'){
-    clearRedisHosts();
-}
+
 
 function clearRedisHosts(){
   // console.log(server.address().port);
