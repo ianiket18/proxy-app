@@ -180,6 +180,10 @@ process.on('exit', function(){
   clearRedisHosts();
 });
 
+if(process.argv.slice(2)[0] == 'clearRedisHost'){
+    clearRedisHosts();
+}
+
 function clearRedisHosts(){
   // console.log(server.address().port);
   // var host = server.address().address
