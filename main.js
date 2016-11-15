@@ -191,19 +191,19 @@ process.on('exit', function(){
 
 function clearRedisHosts(){
   // console.log(server.address().port);
-  // var host = server.address().address
-  // var port = server.address().port
+  var host = ip.address()
+  var port = 3000
 
-  // if(host == "::")
-  // {
-  //   // console.log("In here");
-  //   host = '127.0.0.1';
-  // }
-  // client.lrem('server_list', 1, "http://"+host+":"+port, function(err,reply){
-  //   if (err) throw err;
-  //   console.log(reply);
-  //   process.exit();
-  // })
+  if(host == "::")
+  {
+    // console.log("In here");
+    host = '127.0.0.1';
+  }
+  client.lrem('server_list', 1, "http://"+host+":"+port, function(err,reply){
+    if (err) throw err;
+    console.log(reply);
+    process.exit();
+  })
   spawned_servers.forEach(function(item){
     client.lrem('server_list', 1, item, function(err, reply){
       if (err) throw err;
