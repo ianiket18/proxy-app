@@ -6,6 +6,9 @@ var app = express()
 var request = require('request')
 var enableDestroy = require('server-destroy')
 var ip = require('ip')
+var sys = require('sys')
+var exec = require('child_process').exec;
+
 
 // REDIS
 var client = redis.createClient(6379, 'redis-server', {})
@@ -114,32 +117,24 @@ app.get('/set/:key', function(req, res) {
   // console.log(req.params.key);
 })
 
-app.get('/spawn/:port', function(req, res) {
-  server = createServer(req.params.port, function(server){
-    server_list.push(server);
-    return server
-  })  
+app.get('/spawn/', function(req, res) {
+  
+  exec("docker run -td --link redis-server main_server", function(err, stdout, stderr){
+    server_list.push(stdout);
+  });
   res.send("Server is spawned");
 })
 
 app.get('/destroy/random', function(req, res) {
   server = server_list[Math.floor(Math.random() * server_list.length)];
 
-  var host = server.address().address
-  var port = server.address().port
-  
-  if(host == "::")
-  {
-    // console.log("In here");
-    host = '127.0.0.1';
-  }
-  client.lrem('server_list', 1, 'http://'+host+':'+port, function(err, reply){
-    if (err) throw err;
-    // process.exit();
-  })
+  exec("docker exec -it "+server+" node /home/main-app/main.js clearRedisHost", function(err,stdout,stderr){
+    console.log(stdout);
+  });
 
-  enableDestroy(server);
-  server.destroy();
+  exec("docker kill "+server, function(err,stdout,stderr){
+    console.log(stdout);
+  });
   res.send("Server is destroyed");
 })
 
@@ -204,6 +199,17 @@ function clearRedisHosts(){
     console.log(reply);
     process.exit();
   })
+
+  server_list.forEach(function(server){
+	  exec("docker exec -it "+server+" node /home/main-app/main.js clearRedisHost", function(err,stdout,stderr){
+	    console.log(stdout);
+	  });
+
+	  exec("docker kill "+server, function(err,stdout,stderr){
+	    console.log(stdout);
+	  });
+
+  });
   spawned_servers.forEach(function(item){
     client.lrem('server_list', 1, item, function(err, reply){
       if (err) throw err;
